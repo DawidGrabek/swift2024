@@ -10,12 +10,11 @@ import SwiftUI
 struct GameScreenView: View {
     @StateObject private var viewModel = GameViewModel()
     
-    @State var size = 0.5
-    var foreverAnimation: Animation {
-        Animation.linear(duration: 2)
-            .repeatForever()
-        
-    }
+    @State private var size: CGFloat = 1.0
+    let animationDuration: Double = 0.5
+    let maxSize: CGFloat = 1.3
+
+    let foreverAnimation = Animation.easeInOut(duration: 0.5).repeatForever(autoreverses: true)
     
     var body: some View {
         VStack(spacing: 16) {
@@ -34,22 +33,27 @@ struct GameScreenView: View {
                     )
                 }
             }
-
-            if viewModel.isWin {
-                Text("🎉 Congratulations! You won! 🎉")
-                    .font(.title)
-                    .fontWeight(.semibold)
-                    .foregroundColor(.green)
-                    .padding()
-                    .scaleEffect(size)
-                    .onAppear() {
-                        withAnimation(self.foreverAnimation) {
-                            self.size = 1.3
-                        }
-                    }
             
-
-            } else {
+                
+            VStack {
+                if viewModel.isWin {
+                    Text("🎉 Congratulations! You won! 🎉")
+                        .font(.title)
+                        .fontWeight(.semibold)
+                        .foregroundColor(.green)
+                        .padding()
+                        .scaleEffect(size)
+                }
+            }.onChange(of: viewModel.isWin) { newValue in
+                if newValue {
+                    withAnimation(foreverAnimation) {
+                        size = maxSize
+                    }
+                } else {
+                    size = 1.0
+                }
+            }
+            if !viewModel.isWin {
                 GameRowView(
                     rowData: GameRowData(
                         selectedColors: viewModel.selectedColors,
@@ -60,13 +64,11 @@ struct GameScreenView: View {
                     onReverseSelectColor: {
                         index in viewModel.selectPreviousAvailableColor(index: index)
                     },
-                    onCheck: { viewModel.handleCheckClick() }
+                    onCheck: { viewModel.handleCheckClick() },
+                    isButtonClickable: viewModel.isButtonEnables
                 )
             }
             
-            if(viewModel.isWin){
-            }
-
             Button("Restart Game") {
                 viewModel.initializeGame(numberOfColors: 6)
             }

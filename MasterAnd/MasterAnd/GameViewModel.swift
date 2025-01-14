@@ -12,23 +12,27 @@ class GameViewModel: ObservableObject {
     @Published var selectedColors: [Color] = Array(repeating: .gray, count: 4)
     @Published var attempts: [GameRowData] = []
     @Published var feedbackList: [FeedbackData] = []
-    @Published var isClickable: Bool = true
+    @Published var isClickable: Bool = false
     @Published var isWin: Bool = true
     @Published var availableColors: [Color] = []
     @Published var secretColors: [Color] = []
+    @Published var isButtonEnables: Bool = false
 
     func selectNextAvailableColor(index: Int) {
         let selectedColor = selectedColors[index]
-        print("Test1", selectedColor)
         selectedColors[index] = .gray
         let available = availableColors.filter { !selectedColors.contains($0) }
-        print(available)
         let selectedIndex = available.firstIndex(of: selectedColor) ?? 0
-        print("selectedIndex", selectedIndex)
         selectedColors[index] = available[(selectedIndex + 1) % available.count]
-        print("selectedColor", available[(selectedIndex + 1) % available.count])
         
-        selectedColors.contains(.gray)
+//        selectedColors.contains(.gray)
+        
+        if(!selectedColors.contains(Color.gray)) {
+            isButtonEnables = true
+        }
+        else {
+            isButtonEnables = false
+        }
     }
     
     func selectPreviousAvailableColor(index: Int) {
@@ -38,6 +42,13 @@ class GameViewModel: ObservableObject {
         let selectedIndex = available.firstIndex(of: selectedColor) ?? available.count - 1
         selectedColors[index] = available[(selectedIndex - 1 + available.count) % available.count]
         selectedColors.contains(.gray)
+        
+        if(!selectedColors.contains(Color.gray)) {
+            isButtonEnables = true
+        }
+        else {
+            isButtonEnables = false
+        }
     }
 
     func checkColors() -> [Color] {
@@ -61,6 +72,7 @@ class GameViewModel: ObservableObject {
         }
         selectedColors = Array(repeating: .gray, count: 4)
         isClickable = true
+        isButtonEnables = false
     }
 
     func initializeGame(numberOfColors: Int) {

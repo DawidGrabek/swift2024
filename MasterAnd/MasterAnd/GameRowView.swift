@@ -13,6 +13,7 @@ struct GameRowView: View {
       var onSelectColor: ((Int) -> Void)? = nil
       var onReverseSelectColor: ((Int) -> Void)? = nil
       var onCheck: (() -> Void)? = nil
+      var isButtonClickable: Bool = false
   
       var body: some View {
           HStack(spacing: 8) {
@@ -46,7 +47,7 @@ struct GameRowView: View {
                         }
                     }
                 }
-              if isClickable {
+              if isClickable && isButtonClickable {
                   Button(action: { onCheck?() }) {
                       Image(systemName: "checkmark")
                           .foregroundColor(.white)
